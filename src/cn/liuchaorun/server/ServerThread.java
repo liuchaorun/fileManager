@@ -1,0 +1,40 @@
+/*
+ * ServerThread
+ *
+ * @author lcr
+ * @date 18-7-12
+ */
+package cn.liuchaorun.server;
+
+import java.net.Socket;
+
+public class ServerThread extends Thread {
+    private Socket s = null;
+    private SocketService fmp = null;
+
+    public ServerThread(SocketService fmp){
+        this.fmp = fmp;
+    }
+
+    public synchronized void setS(Socket s) {
+        this.s = s;
+        notify();
+    }
+
+    public boolean isIdle(){
+        return s == null;
+    }
+
+    @Override
+    public synchronized void run() {
+        while (true){
+            try {
+                wait();
+                fmp.service(s);
+                this.s = null;
+            }catch (InterruptedException err){
+                err.printStackTrace();
+            }
+        }
+    }
+}
