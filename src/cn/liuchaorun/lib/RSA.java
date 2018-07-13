@@ -4,7 +4,7 @@
  * @author lcr
  * @date 18-7-12
  */
-package cn.liuchaorun.server;
+package cn.liuchaorun.lib;
 
 import javax.crypto.Cipher;
 import java.io.FileInputStream;
