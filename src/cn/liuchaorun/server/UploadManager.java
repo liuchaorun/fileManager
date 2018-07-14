@@ -9,7 +9,6 @@ package cn.liuchaorun.server;
 import cn.liuchaorun.lib.RSADecrypt;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -40,7 +39,7 @@ public class UploadManager {
      */
     public void uploadDir(DataInputStream dis, DataOutputStream dos){
         try{
-            if(fileLength == 0){
+            if(fileLength == -1){
                 File f = new File(path+name);
                 if(f.exists()){
                     dos.writeChars("OK");
@@ -52,6 +51,7 @@ public class UploadManager {
                         dos.writeChars("FAILED");
                     }
                 }
+                Logger.getGlobal().info(path+name+"上传完成");
             }
         }catch (Exception err){
             err.printStackTrace();
@@ -74,6 +74,7 @@ public class UploadManager {
                 if(n.equals(this.name)&&p.equals(this.path)&&l==this.fileLength){
                     this.currentLength = c;
                 }
+                Logger.getGlobal().info("读取记录完成");
                 return true;
             }else {
                 return false;
@@ -106,12 +107,13 @@ public class UploadManager {
         }
         try {
             FileOutputStream fos = new FileOutputStream(f,true);
+            dos.writeLong(currentLength);
+            dos.flush();
+            Logger.getGlobal().info(""+currentLength);
             while (currentLength <fileLength){
                 int length = dis.readInt();
-                Logger.getGlobal().info("test "+length);
                 byte[] data = new byte[length];
                 if(dis.read(data)==length){
-                    Logger.getGlobal().info(Arrays.toString(data));
                     data = decrypt.privateKeyDecrypt(data);
                     currentLength += data.length;
                     fos.write(data);
@@ -122,6 +124,7 @@ public class UploadManager {
                     dos.flush();
                 }
             }
+            Logger.getGlobal().info(path+name+"上传完成");
             fos.close();
         } catch (Exception e) {
             e.printStackTrace();

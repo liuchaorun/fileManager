@@ -6,66 +6,46 @@
  */
 package cn.liuchaorun.client;
 
-import cn.liuchaorun.lib.RSA;
+import cn.liuchaorun.client.controller.Controller;
 
-import java.io.*;
-import java.net.Socket;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Client {
-    public void start(){
-        try{
-            Socket s = new Socket("127.0.0.1",3000);
-            InputStream sis = s.getInputStream();
-            OutputStream sos = s.getOutputStream();
-            DataOutputStream dos = new DataOutputStream(sos);
-            DataInputStream dis = new DataInputStream(sis);
-            File f = new File("/home/lcr/file/1/temp.txt");
-            FileInputStream fis = new FileInputStream(f);
-            dos.writeChars("UPLOAD\n");
-            dos.flush();
-            int i = 0;
-            dos.writeLong(f.length());
-            dos.flush();
-            dos.writeChars("new/"+f.getName()+'\n');
-            dos.flush();
-            RSA rsa = new RSA();
-            int l = 0;
-            byte[] b = new byte[117];
-            StringBuilder stringBuilder = new StringBuilder();
-            while((l=fis.read(b))==117){
-                do{
-                    stringBuilder = new StringBuilder();
-                    System.out.println(l);
-                    dos.writeInt(128);
-                    dos.flush();
-                    dos.write(rsa.publicKeyEncrypt(b));
-                    dos.flush();
-                    char c = 0;
-                    while ((c = dis.readChar())!='\n'){
-                        stringBuilder.append(c);
+    private Controller controller;
+    private Pattern pattern;
+
+    public Client(){
+        this.controller = new Controller();
+        this.pattern = Pattern.compile("^([a-z]{1,10}) ([^ ].*)");
+    }
+
+    public void start() {
+        while (true) {
+            try {
+                System.out.println("文件管理系统：");
+                System.out.println("请输入指令");
+                Scanner scanner = new Scanner(System.in);
+                String operator = scanner.nextLine();
+                Matcher matcher = pattern.matcher(operator);
+                if (matcher.find()) {
+                    switch (matcher.group(1)) {
+                        case "upload":
+                            controller.upload(matcher.group(2));
+                            break;
+                        default:
+                            System.out.println("错误的指令！");
+                            break;
                     }
-                }while (stringBuilder.toString().equals("RETRY"));
+                }
+                else {
+                    System.out.println("错误的指令格式！");
+                }
+            } catch (Exception err) {
+                err.printStackTrace();
+                break;
             }
-            if(l > 0){
-                stringBuilder = new StringBuilder();
-                byte[] rest = new byte[l];
-                System.arraycopy(b,0,rest,0,l);
-                do{
-                    dos.writeInt(128);
-                    dos.flush();
-                    dos.write(rsa.publicKeyEncrypt(rest));
-                    dos.flush();
-                    char c = 0;
-                    while ((c = dis.readChar())!='\n'){
-                        stringBuilder.append(c);
-                    }
-                }while (stringBuilder.toString().equals("RETRY"));
-            }
-            System.out.println("success!");
-            dos.writeChars("CLOSE\n");
-            dos.flush();
-        }catch (Exception err){
-            err.printStackTrace();
         }
     }
 }

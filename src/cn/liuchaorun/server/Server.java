@@ -6,12 +6,13 @@
  */
 package cn.liuchaorun.server;
 
+import cn.liuchaorun.lib.RSA;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class Server {
     private Properties config;
@@ -20,7 +21,8 @@ public class Server {
     public Server() {
         this.config = new Properties();
         try {
-            FileReader fr = new FileReader("src/cn/liuchaorun/config.properties");
+            String configPath = RSA.class.getResource("../config.properties").toString();
+            FileReader fr = new FileReader(configPath.substring(5,configPath.length()));
             this.config.load(fr);
         } catch (IOException e) {
             e.printStackTrace();
@@ -30,7 +32,6 @@ public class Server {
     public void start() {
         try {
             ServerSocket ss = new ServerSocket(Integer.parseInt(config.getProperty("port")));
-            Logger.getGlobal().info("this is a test log");
             System.out.println("Server start in port " + config.getProperty("port"));
             while (true) {
                 Socket s = ss.accept();
