@@ -24,7 +24,7 @@ public class UploadManager {
     public UploadManager(String pathName, long fileLength){
         String[] s = pathName.split("/");
         this.name = s[s.length -1];
-        StringBuilder stringBuilder = new StringBuilder("./");
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < s.length - 1; i++){
             stringBuilder.append(s[i]);
             stringBuilder.append("/");

@@ -20,9 +20,11 @@ public class RSA implements RSADecrypt,RSAEncrypt {
     public RSA() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileReader("src/cn/liuchaorun/config.properties"));
-            publicKey =(Key) new ObjectInputStream(new FileInputStream(properties.getProperty("publicKey"))).readObject();
-            privateKey =(Key) new ObjectInputStream(new FileInputStream(properties.getProperty("privateKey"))).readObject();
+            String configPath = RSA.class.getResource("../config.properties").toString();
+            properties.load(new FileReader(configPath.substring(5,configPath.length())));
+            String libPath = RSA.class.getResource("./").toString();
+            publicKey =(Key) new ObjectInputStream(new FileInputStream(libPath.substring(5,libPath.length())+properties.getProperty("publicKey"))).readObject();
+            privateKey =(Key) new ObjectInputStream(new FileInputStream(libPath.substring(5,libPath.length())+properties.getProperty("privateKey"))).readObject();
         } catch (Exception e) {
             e.printStackTrace();
         }

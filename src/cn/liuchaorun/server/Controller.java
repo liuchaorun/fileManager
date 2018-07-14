@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 public class Controller {
     private RSA rsa = new RSA();
+    private final String prefix = "/home/lcr/file/";
     public void upload(DataInputStream dis, DataOutputStream dos){
         try{
             long fileLength = dis.readLong();
@@ -25,7 +26,7 @@ public class Controller {
             }
             String path = stringBuilder.toString();
             Logger.getGlobal().info("path = "+path);
-            UploadManager uploadManager = new UploadManager(path,fileLength);
+            UploadManager uploadManager = new UploadManager(prefix+path,fileLength);
             if(fileLength == 0){
                 uploadManager.uploadDir(dis,dos);
             }else {
