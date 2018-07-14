@@ -107,25 +107,21 @@ public class UploadManager {
         }
         try {
             FileOutputStream fos = new FileOutputStream(f,true);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fos);
             dos.writeLong(currentLength);
             dos.flush();
             Logger.getGlobal().info(""+currentLength);
-            while (currentLength <fileLength){
-                int length = dis.readInt();
+            int length = dis.readInt();
+            Logger.getGlobal().info(path+name+"开始上传");
+            while (currentLength < fileLength){
                 byte[] data = new byte[length];
-                if(dis.read(data)==length){
-                    data = decrypt.privateKeyDecrypt(data);
-                    currentLength += data.length;
-                    fos.write(data);
-                    dos.writeChars("OK\n");
-                    dos.flush();
-                }else {
-                    dos.writeChars("RETRY\n");
-                    dos.flush();
-                }
+                length = dis.read(data);
+                data = decrypt.privateKeyDecrypt(data);
+                currentLength += data.length;
+                bufferedOutputStream.write(data);
             }
             Logger.getGlobal().info(path+name+"上传完成");
-            fos.close();
+            bufferedOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
             Logger.getGlobal().info("文件上传中断，记录此次信息！");

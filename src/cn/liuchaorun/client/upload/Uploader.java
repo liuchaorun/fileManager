@@ -64,38 +64,30 @@ public class Uploader {
      * @param dis
      * @param dos
      */
-    public void uploadFile(FileInputStream fis, DataInputStream dis, DataOutputStream dos, RSAEncrypt encrypt,long length){
+    public void uploadFile(BufferedInputStream bufferedInputStream, DataInputStream dis, DataOutputStream dos, RSAEncrypt encrypt,long length){
         try{
             dos.writeChars(path+name+'\n');
             dos.flush();
             long currentLength = dis.readLong();
-            long actuallySkip = fis.skip(currentLength);
+            long actuallySkip = bufferedInputStream.skip(currentLength);
             while (actuallySkip < currentLength){
-                actuallySkip = fis.skip(currentLength - actuallySkip);
+                actuallySkip = bufferedInputStream.skip(currentLength - actuallySkip);
             }
-            byte[] b = new byte[501];
-            StringBuilder stringBuilder;
+            byte[] b = new byte[117];
             long fileLength = length;
             int l = 0;
+            dos.writeInt(128);
+            dos.flush();
             while (currentLength < fileLength){
-                if(fileLength - currentLength >=501){
-                    l = fis.read(b);
+                if(fileLength - currentLength >=117){
+                    l = bufferedInputStream.read(b);
                 }
                 else {
                     b = new byte[(int)(fileLength - currentLength)];
-                    l = fis.read(b);
+                    l = bufferedInputStream.read(b);
                 }
-                do{
-                    stringBuilder = new StringBuilder();
-                    dos.writeInt(501);
-                    dos.flush();
-                    dos.write(encrypt.publicKeyEncrypt(b));
-                    dos.flush();
-                    char c = 0;
-                    while ((c = dis.readChar())!='\n'){
-                        stringBuilder.append(c);
-                    }
-                }while (stringBuilder.toString().equals("RETRY"));
+                dos.write(encrypt.publicKeyEncrypt(b));
+                dos.flush();
                 currentLength += l;
             }
             System.out.println(path + name + " success!");

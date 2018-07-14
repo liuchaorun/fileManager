@@ -8,10 +8,7 @@ package cn.liuchaorun.client.upload;
 
 import cn.liuchaorun.lib.RSAEncrypt;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class UploadThread extends Thread {
@@ -58,8 +55,8 @@ public class UploadThread extends Thread {
         try{
             while (true){
                 wait();
-                DataInputStream dis = new DataInputStream(s.getInputStream());
-                DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+                DataInputStream dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+                DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
                 dos.writeChars("UPLOAD\n");
                 dos.flush();
                 if(isFile){
@@ -67,7 +64,8 @@ public class UploadThread extends Thread {
                     dos.writeLong(f.length());
                     dos.flush();
                     FileInputStream fis = new FileInputStream(f);
-                    uploader.uploadFile(fis,dis,dos,encrypt,f.length());
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(fis);
+                    uploader.uploadFile(bufferedInputStream,dis,dos,encrypt,f.length());
                     fis.close();
                 }else {
                     uploader.uploadDir(dis,dos);

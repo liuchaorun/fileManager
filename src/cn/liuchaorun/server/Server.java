@@ -35,6 +35,7 @@ public class Server {
             System.out.println("Server start in port " + config.getProperty("port"));
             while (true) {
                 Socket s = ss.accept();
+                s.setSoTimeout(5*1000);
                 threadsPool.service(s);
             }
         } catch (IOException err) {
