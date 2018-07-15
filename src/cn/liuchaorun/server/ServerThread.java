@@ -31,8 +31,9 @@ public class ServerThread extends Thread {
             try {
                 wait();
                 fmp.service(s);
+                this.s.close();
                 this.s = null;
-            }catch (InterruptedException err){
+            }catch (Exception err){
                 err.printStackTrace();
             }
         }

@@ -6,6 +6,8 @@
  */
 package cn.liuchaorun.client.upload;
 
+import cn.liuchaorun.lib.AES;
+import cn.liuchaorun.lib.AESEncrypt;
 import cn.liuchaorun.lib.RSAEncrypt;
 
 import java.io.*;
@@ -16,6 +18,7 @@ import java.io.*;
 public class Uploader {
     private String path;
     private String name;
+    private AESEncrypt aesEncrypt;
 
     public Uploader(String filePath){
         String[] s = filePath.split("/");
@@ -73,20 +76,23 @@ public class Uploader {
             while (actuallySkip < currentLength){
                 actuallySkip = bufferedInputStream.skip(currentLength - actuallySkip);
             }
-            byte[] b = new byte[117];
+
+            //byte[] b = new byte[117];
+            byte[] b = new byte[15];
             long fileLength = length;
             int l = 0;
-            dos.writeInt(128);
+            dos.writeInt(15);
             dos.flush();
             while (currentLength < fileLength){
-                if(fileLength - currentLength >=117){
+                if(fileLength - currentLength >=128){
                     l = bufferedInputStream.read(b);
                 }
                 else {
                     b = new byte[(int)(fileLength - currentLength)];
                     l = bufferedInputStream.read(b);
                 }
-                dos.write(encrypt.publicKeyEncrypt(b));
+                //dos.write(encrypt.publicKeyEncrypt(b));
+                dos.write(b);
                 dos.flush();
                 currentLength += l;
             }

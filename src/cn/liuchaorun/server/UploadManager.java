@@ -116,7 +116,7 @@ public class UploadManager {
             while (currentLength < fileLength){
                 byte[] data = new byte[length];
                 length = dis.read(data);
-                data = decrypt.privateKeyDecrypt(data);
+                //data = decrypt.privateKeyDecrypt(data);
                 currentLength += data.length;
                 bufferedOutputStream.write(data);
             }

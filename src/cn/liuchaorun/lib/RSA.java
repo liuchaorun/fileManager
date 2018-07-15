@@ -16,10 +16,12 @@ import java.util.Properties;
 public class RSA implements RSADecrypt,RSAEncrypt {
     private Key publicKey = null;
     private Key privateKey = null;
+    private Cipher cipher;
 
     public RSA() {
         Properties properties = new Properties();
         try {
+            cipher = Cipher.getInstance("RSA");
             String configPath = RSA.class.getResource("../config.properties").toString();
             properties.load(new FileReader(configPath.substring(5,configPath.length())));
             String libPath = RSA.class.getResource("./").toString();
@@ -32,7 +34,6 @@ public class RSA implements RSADecrypt,RSAEncrypt {
 
     public byte[] privateKeyEncrypt(byte[] data){
         try {
-            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE,this.privateKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -43,7 +44,6 @@ public class RSA implements RSADecrypt,RSAEncrypt {
 
     public byte[] publicKeyEncrypt(byte[] data){
         try {
-            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE,this.publicKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -54,7 +54,6 @@ public class RSA implements RSADecrypt,RSAEncrypt {
 
     public byte[] privateKeyDecrypt(byte[] data){
         try {
-            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE,this.privateKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -65,7 +64,6 @@ public class RSA implements RSADecrypt,RSAEncrypt {
 
     public byte[] publicKeyDecrypt(byte[] data){
         try {
-            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE,this.publicKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
