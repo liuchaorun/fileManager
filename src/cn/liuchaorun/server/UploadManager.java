@@ -6,9 +6,15 @@
  */
 package cn.liuchaorun.server;
 
+import cn.liuchaorun.lib.AES;
+import cn.liuchaorun.lib.ObjectAndBytes;
 import cn.liuchaorun.lib.RSADecrypt;
 
+import javax.crypto.CipherInputStream;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
+import java.security.Key;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -107,21 +113,41 @@ public class UploadManager {
         }
         try {
             FileOutputStream fos = new FileOutputStream(f,true);
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fos);
+            BufferedOutputStream fileBufferedOutputStream = new BufferedOutputStream(fos);
             dos.writeLong(currentLength);
             dos.flush();
             Logger.getGlobal().info(""+currentLength);
-            int length = dis.readInt();
+            byte[] b = new byte[128];
+            dis.readFully(b);
+            byte[] iv = decrypt.privateKeyDecrypt(b);
+            int objectArrayLength = dis.readInt();
+            byte[] o = new byte[objectArrayLength];
+            int c = 0;
+            while (c < objectArrayLength){
+                dis.readFully(b);
+                byte[] temp = decrypt.privateKeyDecrypt(b);
+                System.arraycopy(temp,0,o,c,temp.length);
+                c+=temp.length;
+            }
+            Key key = (Key) ObjectAndBytes.toObject(o);
+
+            int length = 16;
+            AES aes = new AES(key,iv);
+            CipherInputStream cipherInputStream = aes.decrypt(dis);
             Logger.getGlobal().info(path+name+"开始上传");
             while (currentLength < fileLength){
                 byte[] data = new byte[length];
-                length = dis.read(data);
-                //data = decrypt.privateKeyDecrypt(data);
+                length = cipherInputStream.read(data);
                 currentLength += data.length;
-                bufferedOutputStream.write(data);
+                Logger.getGlobal().info(cipherInputStream.available()+" "+length+" "+Arrays.toString(data));
+                fileBufferedOutputStream.write(data,0,length);
             }
+            byte[] a = new byte[cipherInputStream.available()];
+            cipherInputStream.read(a);
+            System.out.println(Arrays.toString(a));
+            System.out.println(cipherInputStream.available()+"");
             Logger.getGlobal().info(path+name+"上传完成");
-            bufferedOutputStream.close();
+            fileBufferedOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
             Logger.getGlobal().info("文件上传中断，记录此次信息！");

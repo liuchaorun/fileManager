@@ -8,9 +8,16 @@ package cn.liuchaorun.client.upload;
 
 import cn.liuchaorun.lib.AES;
 import cn.liuchaorun.lib.AESEncrypt;
+import cn.liuchaorun.lib.ObjectAndBytes;
 import cn.liuchaorun.lib.RSAEncrypt;
 
+import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * 上传工作的类，主要作用为控制上传的进度
@@ -67,36 +74,58 @@ public class Uploader {
      * @param dis
      * @param dos
      */
-    public void uploadFile(BufferedInputStream bufferedInputStream, DataInputStream dis, DataOutputStream dos, RSAEncrypt encrypt,long length){
+    public void uploadFile(BufferedInputStream fileBufferedInputStream, DataInputStream dis, DataOutputStream dos, RSAEncrypt encrypt,long length){
         try{
             dos.writeChars(path+name+'\n');
             dos.flush();
             long currentLength = dis.readLong();
-            long actuallySkip = bufferedInputStream.skip(currentLength);
+            long actuallySkip = fileBufferedInputStream.skip(currentLength);
             while (actuallySkip < currentLength){
-                actuallySkip = bufferedInputStream.skip(currentLength - actuallySkip);
+                actuallySkip = fileBufferedInputStream.skip(currentLength - actuallySkip);
+            }
+            Key key = AES.generatorKey();
+            byte[] iv = AES.generateIvParamterApec();
+            dos.write(encrypt.publicKeyEncrypt(iv));
+            dos.flush();
+            byte[] o = ObjectAndBytes.toByteArray(key);
+            dos.writeInt(o.length);
+            byte[] bytes = new byte[117];
+            int c = 0;
+            while (c < o.length){
+                if(o.length - c>=117){
+                    System.arraycopy(o,c,bytes,0,bytes.length);
+                }
+                else {
+                    bytes = new byte[o.length - c];
+                    System.arraycopy(o,c,bytes,0,bytes.length);
+                }
+                dos.write(encrypt.publicKeyEncrypt(bytes));
+                c+=bytes.length;
             }
 
-            //byte[] b = new byte[117];
-            byte[] b = new byte[15];
+            this.aesEncrypt = new AES(key,iv);
+
+            CipherOutputStream cipherOutputStream = aesEncrypt.encrypt(dos);
+            byte[] b = new byte[16];
             long fileLength = length;
             int l = 0;
-            dos.writeInt(15);
-            dos.flush();
             while (currentLength < fileLength){
-                if(fileLength - currentLength >=128){
-                    l = bufferedInputStream.read(b);
+                Logger.getGlobal().info(fileBufferedInputStream.available()+"  "+ fileLength);
+                if(fileLength - currentLength >=16){
+                    l = fileBufferedInputStream.read(b);
                 }
                 else {
                     b = new byte[(int)(fileLength - currentLength)];
-                    l = bufferedInputStream.read(b);
+                    l = fileBufferedInputStream.read(b);
                 }
-                //dos.write(encrypt.publicKeyEncrypt(b));
-                dos.write(b);
-                dos.flush();
+                Logger.getGlobal().info(Arrays.toString(b));
+                cipherOutputStream.write(b);
+                cipherOutputStream.flush();
                 currentLength += l;
             }
             System.out.println(path + name + " success!");
+            dos.writeChars("CLOSE\n");
+            dos.flush();
             dos.writeChars("CLOSE\n");
             dos.flush();
         }catch (Exception err){

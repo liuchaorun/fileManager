@@ -17,8 +17,10 @@ public class FileManagerProtocol implements SocketService {
     @Override
     public void service(Socket s) {
         try{
-            DataInputStream dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-            DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream(),512);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream(),512);
+            DataInputStream dis = new DataInputStream(bufferedInputStream);
+            DataOutputStream dos = new DataOutputStream(bufferedOutputStream);
             while (true){
                 StringBuilder stringBuilder = new StringBuilder();
                 char c = 0;

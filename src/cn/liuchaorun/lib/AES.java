@@ -19,22 +19,22 @@ public class AES implements AESDecrypt,AESEncrypt {
     private Cipher cipher;
     private IvParameterSpec ivParameterSpec;
 
-    public AES(Key key,IvParameterSpec ivParameterSpec){
+    public AES(Key key,byte[] iv){
         try{
             this.key = key;
             cipher = Cipher.getInstance("AES/CFB8/NoPadding");
-            this.ivParameterSpec = ivParameterSpec;
+            this.ivParameterSpec = new IvParameterSpec(iv);
         }catch (Exception err){
             err.printStackTrace();
         }
     }
 
-    public static IvParameterSpec generateIvParamterApec(){
+    public static byte[] generateIvParamterApec(){
         int ivSize = 16;
         byte[] iv = new byte[ivSize];
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
-        return new IvParameterSpec(iv);
+        return iv;
     }
 
     public static Key generatorKey() throws NoSuchAlgorithmException {
@@ -48,14 +48,6 @@ public class AES implements AESDecrypt,AESEncrypt {
     public CipherInputStream decrypt(InputStream is) {
         try {
             cipher.init(Cipher.DECRYPT_MODE,key,ivParameterSpec);
-//            byte[] b = new byte[cipher.getBlockSize()];
-//            int length = cipherInputStream.read(b);
-//            while (length != -1){
-//                fileOutputStream.write(b,0,length);
-//                length = cipherInputStream.read(b);
-//            }
-//            cipherInputStream.close();
-//            fileOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,19 +58,6 @@ public class AES implements AESDecrypt,AESEncrypt {
     public CipherOutputStream encrypt(OutputStream os) {
         try {
             cipher.init(Cipher.ENCRYPT_MODE,key,ivParameterSpec);
-//            byte[] b = new byte[cipher.getBlockSize()];
-//            int length  = fileInputStream.read(b);
-//            while(length!=-1){
-//                cos.write(b);
-//                cos.flush();
-//                if(fileInputStream.available() == 0){
-//                    break;
-//                }
-//                if(fileInputStream.available() < 16){
-//                    b = new byte[fileInputStream.available()];
-//                }
-//                length = fileInputStream.read(b);
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

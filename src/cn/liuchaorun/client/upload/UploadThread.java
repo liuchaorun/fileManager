@@ -55,8 +55,10 @@ public class UploadThread extends Thread {
         try{
             while (true){
                 wait();
-                DataInputStream dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-                DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream(),512);
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream(),512);
+                DataInputStream dis = new DataInputStream(bufferedInputStream);
+                DataOutputStream dos = new DataOutputStream(bufferedOutputStream);
                 dos.writeChars("UPLOAD\n");
                 dos.flush();
                 if(isFile){
@@ -64,8 +66,8 @@ public class UploadThread extends Thread {
                     dos.writeLong(f.length());
                     dos.flush();
                     FileInputStream fis = new FileInputStream(f);
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(fis);
-                    uploader.uploadFile(bufferedInputStream,dis,dos,encrypt,f.length());
+                    BufferedInputStream fileBufferedInputStream = new BufferedInputStream(fis);
+                    uploader.uploadFile(fileBufferedInputStream,dis,dos,encrypt,f.length());
                     fis.close();
                 }else {
                     uploader.uploadDir(dis,dos);

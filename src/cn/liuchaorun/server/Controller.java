@@ -8,8 +8,7 @@ package cn.liuchaorun.server;
 
 import cn.liuchaorun.lib.RSA;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.*;
 import java.util.logging.Logger;
 
 public class Controller {
