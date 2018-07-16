@@ -138,9 +138,10 @@ public class UploadManager {
             Logger.getGlobal().info(path+name+"开始上传");
             long start = System.currentTimeMillis()/1000;
             while (currentLength < fileLength){
+                length = (int)(fileLength-currentLength>=16?16:fileLength - currentLength);
                 byte[] data = new byte[length];
-                length = cipherInputStream.read(data,0,(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
-                fileBufferedOutputStream.write(data,0,(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
+                length = cipherInputStream.read(data,0,length);
+                fileBufferedOutputStream.write(data,0,length);
                 fileBufferedOutputStream.flush();
                 currentLength += data.length;
             }
