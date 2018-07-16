@@ -7,6 +7,7 @@
 package cn.liuchaorun.client.upload;
 
 import cn.liuchaorun.client.FindFile.FileInfo;
+import cn.liuchaorun.client.InfoOutput;
 import cn.liuchaorun.lib.RSA;
 import cn.liuchaorun.lib.RSAEncrypt;
 
@@ -19,14 +20,15 @@ public class UploadManager extends Thread implements UploadService {
     private final int MAX_THREAD;
     private RSAEncrypt encrypt;
     private LinkedList<FileInfo> uploadFiles;
+    private InfoOutput infoOutput;
 
-    public UploadManager(int number, LinkedList<FileInfo> uploadFiles){
-
+    public UploadManager(int number, LinkedList<FileInfo> uploadFiles, InfoOutput infoOutput){
+        this.infoOutput = infoOutput;
         this.MAX_THREAD = number;
         this.uploadFiles = uploadFiles;
         this.encrypt = new RSA();
         for (int i = 0; i < MAX_THREAD; i++){
-            UploadThread one = new UploadThread(encrypt);
+            UploadThread one = new UploadThread(encrypt,infoOutput);
             one.start();
             treads.add(one);
         }
@@ -45,7 +47,7 @@ public class UploadManager extends Thread implements UploadService {
                 UploadThread one = ((UploadThread)treads.get(i));
                 if(one.isIdle()){
                     flag = i;
-                    Uploader uploader = new Uploader(filePath);
+                    Uploader uploader = new Uploader(filePath,infoOutput);
                     one.setAbsolutePath(absolutePath);
                     one.setFilePath(filePath);
                     one.setFile(new File(absolutePath+filePath).isFile());
@@ -63,6 +65,7 @@ public class UploadManager extends Thread implements UploadService {
     public void run() {
         try {
             while (true){
+                infoOutput.setAllNumber(uploadFiles.size());
                 if(uploadFiles.size() != 0) {
                     FileInfo fileInfo = uploadFiles.getFirst();
                     service(fileInfo.getName(), fileInfo.getPath());

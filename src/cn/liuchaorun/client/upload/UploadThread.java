@@ -6,6 +6,7 @@
  */
 package cn.liuchaorun.client.upload;
 
+import cn.liuchaorun.client.InfoOutput;
 import cn.liuchaorun.client.controller.Controller;
 import cn.liuchaorun.lib.RSAEncrypt;
 
@@ -20,8 +21,10 @@ public class UploadThread extends Thread {
     private RSAEncrypt encrypt;
     private String absolutePath;
     private Properties config;
+    private InfoOutput infoOutput;
 
-    public UploadThread(RSAEncrypt encrypt) {
+    public UploadThread(RSAEncrypt encrypt,InfoOutput infoOutput) {
+        this.infoOutput = infoOutput;
         this.config = new Properties();
         try {
             String configPath = Controller.class.getResource("../../config.properties").toString();

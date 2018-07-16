@@ -26,7 +26,7 @@ public class Controller {
             String path = stringBuilder.toString();
             //Logger.getGlobal().info("path = "+path);
             UploadManager uploadManager = new UploadManager(prefix+path,fileLength);
-            if(fileLength == -1){
+            if(fileLength == (long)-1){
                 uploadManager.uploadDir(dis,dos);
             }else {
                 boolean flag = false;

@@ -8,6 +8,7 @@ package cn.liuchaorun.client.controller;
 
 import cn.liuchaorun.client.FindFile.FileInfo;
 import cn.liuchaorun.client.FindFile.FindFiles;
+import cn.liuchaorun.client.InfoOutput;
 import cn.liuchaorun.client.upload.UploadManager;
 
 import java.io.File;
@@ -17,10 +18,12 @@ import java.util.LinkedList;
 public class Controller {
     private UploadManager uploadManager;
     private LinkedList<FileInfo> uploadFiles = new LinkedList<>();
+    private InfoOutput infoOutput;
 
-    public Controller() {
+    public Controller(InfoOutput infoOutput) {
         try {
-            this.uploadManager = new UploadManager(5,this.uploadFiles);
+            this.infoOutput = infoOutput;
+            this.uploadManager = new UploadManager(5,this.uploadFiles,this.infoOutput);
             this.uploadManager.start();
         } catch (Exception e) {
             e.printStackTrace();

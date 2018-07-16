@@ -6,6 +6,7 @@
  */
 package cn.liuchaorun.client.upload;
 
+import cn.liuchaorun.client.InfoOutput;
 import cn.liuchaorun.lib.AES;
 import cn.liuchaorun.lib.AESEncrypt;
 import cn.liuchaorun.lib.ObjectAndBytes;
@@ -23,8 +24,10 @@ public class Uploader {
     private String path;
     private String name;
     private AESEncrypt aesEncrypt;
+    private InfoOutput infoOutput;
 
-    public Uploader(String filePath){
+    public Uploader(String filePath,InfoOutput infoOutput){
+        this.infoOutput = infoOutput;
         String[] s = filePath.split("/");
         this.name = s[s.length -1];
         StringBuilder stringBuilder = new StringBuilder();
@@ -52,9 +55,13 @@ public class Uploader {
         }
         if(stringBuilder.toString().equals("OK")){
             //System.out.println("文件夹上传成功!");
+            infoOutput.setInfo(path+name+"文件夹上传成功!");
+            infoOutput.setFinishedNumber();
         }
         else {
             //System.out.println("文件夹上传失败！");
+            infoOutput.setInfo("文件夹上传失败!");
+            infoOutput.setFinishedNumber();
         }
         dos.writeChars("CLOSE\n");
         dos.flush();
@@ -117,7 +124,9 @@ public class Uploader {
                 cipherOutputStream.flush();
                 currentLength += l;
             }
-            System.out.println(path + name + " success!");
+            infoOutput.setInfo(path + name + " success!");
+            infoOutput.setFinishedNumber();
+            //System.out.println(path + name + " success!");
             dos.writeChars("CLOSE\n");
             dos.flush();
         }catch (Exception err){

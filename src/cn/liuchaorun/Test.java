@@ -6,17 +6,15 @@
  */
 package cn.liuchaorun;
 
+import cn.liuchaorun.client.InfoOutput;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.security.*;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Scanner;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.regex.Matcher;
 
 public class Test {
     private static final int KEYSIZE = 1024;
-    public LinkedList<Integer> a = new LinkedList<>();
 
     public static void main(String[] args) throws IOException, GeneralSecurityException, ClassCastException {
 //        KeyPairGenerator pairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -29,46 +27,14 @@ public class Test {
 //        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("private.key"))){
 //            out.writeObject(keyPair.getPrivate());
 //        }
-        Test t = new Test();
-        try {
-            t.a.addLast(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println(Arrays.toString(t.a.toArray()));
-        new testTread(t.a).start();
-        System.out.println(1);
-        while (true) {
-            try {
-                System.out.println("文件管理系统：");
-                System.out.println("请输入指令");
-                t.a.addLast(2);
-                System.out.println(Arrays.toString(t.a.toArray()));
-                Thread.sleep(1000);
-            } catch (Exception err) {
-                err.printStackTrace();
-                break;
-            }
-        }
     }
 }
 
-class testTread extends Thread{
-    private LinkedList<Integer> a;
+class SimpleFrame extends JFrame {
+    private static final int DEFAULT_WIDTH = 300;
+    private static final int DEFAULT_HEIGHT = 200;
 
-    public testTread(LinkedList<Integer> a){
-        this.a = a;
-    }
-
-    @Override
-    public void run() {
-        while(true){
-            System.out.println(Arrays.toString(a.toArray()));
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+    public SimpleFrame(){
+        setSize(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     }
 }

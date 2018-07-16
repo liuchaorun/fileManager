@@ -7,6 +7,7 @@ package cn.liuchaorun.client.FindFile;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 public class FindFiles {
     private void getAllFiles(LinkedList<FileInfo> list,File f,String rootPath){
@@ -19,7 +20,11 @@ public class FindFiles {
             if (files != null) {
                 if(files.length == 0){
                     String absolute = (new File(f.getParent())).getPath();
-                    list.add(new FileInfo(f.getName(),-1,absolute.substring(rootPath.length(),absolute.length())+'/'));
+                    if(rootPath.equals(f.getPath())){
+                        list.add(new FileInfo("",-1,""));
+                    }else {
+                        list.add(new FileInfo(f.getName(),-1,absolute.substring(rootPath.length(),absolute.length())+'/'));
+                    }
                 }
                 else {
                     for (String i:files){

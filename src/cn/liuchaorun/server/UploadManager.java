@@ -44,15 +44,18 @@ public class UploadManager {
     public void uploadDir(DataInputStream dis, DataOutputStream dos){
         try{
             if(fileLength == -1){
-                File f = new File(path+name+'\n');
+                File f = new File(path+name);
                 if(f.exists()){
                     dos.writeChars("OK\n");
+                    dos.flush();
                 }
                 else {
                     if(f.mkdirs()){
                         dos.writeChars("OK\n");
+                        dos.flush();
                     }else {
                         dos.writeChars("FAILED\n");
+                        dos.flush();
                     }
                 }
                 Logger.getGlobal().info(path+name+"上传完成");
