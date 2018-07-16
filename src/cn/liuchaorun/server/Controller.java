@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class Controller {
     private RSA rsa = new RSA();
     private final String prefix = "/home/lcr/file/";
-    public void upload(DataInputStream dis, DataOutputStream dos){
+    public void upload(DataInputStream dis, DataOutputStream dos,BufferedInputStream bufferedInputStream){
         try{
             long fileLength = dis.readLong();
             Logger.getGlobal().info("fileLength = " + fileLength);
@@ -34,7 +34,7 @@ public class Controller {
                 }else {
                     Logger.getGlobal().info("开始上传");
                 }
-                uploadManager.uploadFile(dis,dos,rsa);
+                uploadManager.uploadFile(dis,dos,rsa,bufferedInputStream);
             }
         }catch (Exception err){
             err.printStackTrace();

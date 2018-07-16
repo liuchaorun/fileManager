@@ -110,7 +110,6 @@ public class Uploader {
             long fileLength = length;
             int l = 0;
             while (currentLength < fileLength){
-                Logger.getGlobal().info(fileBufferedInputStream.available()+"  "+ fileLength);
                 if(fileLength - currentLength >=16){
                     l = fileBufferedInputStream.read(b);
                 }
@@ -118,14 +117,11 @@ public class Uploader {
                     b = new byte[(int)(fileLength - currentLength)];
                     l = fileBufferedInputStream.read(b);
                 }
-                Logger.getGlobal().info(Arrays.toString(b));
                 cipherOutputStream.write(b);
                 cipherOutputStream.flush();
                 currentLength += l;
             }
             System.out.println(path + name + " success!");
-            dos.writeChars("CLOSE\n");
-            dos.flush();
             dos.writeChars("CLOSE\n");
             dos.flush();
         }catch (Exception err){

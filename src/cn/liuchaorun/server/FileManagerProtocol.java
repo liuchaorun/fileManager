@@ -29,14 +29,22 @@ public class FileManagerProtocol implements SocketService {
                 }
                 if(stringBuilder.toString().equals("UPLOAD")){
                     Logger.getGlobal().info("正在准备上传");
-                    controller.upload(dis,dos);
+                    controller.upload(dis,dos,bufferedInputStream);
                 }else if(stringBuilder.toString().equals("CLOSE")){
                     s.close();
                     Logger.getGlobal().info("SOCKET CLOSE");
                     break;
                 }
             }
-        }catch (Exception err){
+        }catch (EOFException err){
+            try {
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Logger.getGlobal().info("SOCKET CLOSE");
+        }
+        catch (Exception err){
             err.printStackTrace();
         }
     }

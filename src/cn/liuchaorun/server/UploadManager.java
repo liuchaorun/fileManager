@@ -11,10 +11,8 @@ import cn.liuchaorun.lib.ObjectAndBytes;
 import cn.liuchaorun.lib.RSADecrypt;
 
 import javax.crypto.CipherInputStream;
-import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.security.Key;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -97,7 +95,7 @@ public class UploadManager {
      * @param decrypt
      * @param dos
      */
-    public void uploadFile(DataInputStream dis, DataOutputStream dos, RSADecrypt decrypt){
+    public void uploadFile(DataInputStream dis, DataOutputStream dos, RSADecrypt decrypt,BufferedInputStream bufferedInputStream){
         File f = new File(path+name);
         Logger.getGlobal().info(path);
         if(!f.exists()){
@@ -133,20 +131,17 @@ public class UploadManager {
 
             int length = 16;
             AES aes = new AES(key,iv);
-            CipherInputStream cipherInputStream = aes.decrypt(dis);
+            CipherInputStream cipherInputStream = aes.decrypt(bufferedInputStream);
             Logger.getGlobal().info(path+name+"开始上传");
+            long start = System.currentTimeMillis()/1000;
             while (currentLength < fileLength){
                 byte[] data = new byte[length];
-                length = cipherInputStream.read(data);
+                length = cipherInputStream.read(data,0,(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
+                fileBufferedOutputStream.write(data,0,(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
                 currentLength += data.length;
-                Logger.getGlobal().info(cipherInputStream.available()+" "+length+" "+Arrays.toString(data));
-                fileBufferedOutputStream.write(data,0,length);
             }
-            byte[] a = new byte[cipherInputStream.available()];
-            cipherInputStream.read(a);
-            System.out.println(Arrays.toString(a));
-            System.out.println(cipherInputStream.available()+"");
-            Logger.getGlobal().info(path+name+"上传完成");
+            long end = System.currentTimeMillis()/1000;
+            Logger.getGlobal().info(path+name+"上传完成,平均速度为"+(fileLength/(1000*(end==start?1:end-start)))+"KB/S");
             fileBufferedOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
