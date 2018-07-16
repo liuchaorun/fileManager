@@ -28,8 +28,8 @@ public class FileManagerProtocol implements SocketService {
                     stringBuilder.append(c);
                 }
                 if(stringBuilder.toString().equals("UPLOAD")){
-                    Logger.getGlobal().info("正在准备上传");
-                    controller.upload(dis,dos,bufferedInputStream);
+                    //Logger.getGlobal().info("正在准备上传");
+                    controller.upload(dis,dos);
                 }else if(stringBuilder.toString().equals("CLOSE")){
                     s.close();
                     Logger.getGlobal().info("SOCKET CLOSE");

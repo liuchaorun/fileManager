@@ -11,23 +11,17 @@ import cn.liuchaorun.client.FindFile.FindFiles;
 import cn.liuchaorun.client.upload.UploadManager;
 
 import java.io.File;
-import java.io.FileReader;
 import java.lang.Exception;
-import java.net.Socket;
 import java.util.LinkedList;
-import java.util.Properties;
 
 public class Controller {
-    private Properties config;
     private UploadManager uploadManager;
+    private LinkedList<FileInfo> uploadFiles = new LinkedList<>();
 
     public Controller() {
-        this.config = new Properties();
         try {
-            String configPath = Controller.class.getResource("../../config.properties").toString();
-            FileReader fr = new FileReader(configPath.substring(5, configPath.length()));
-            this.config.load(fr);
-            this.uploadManager = new UploadManager(5);
+            this.uploadManager = new UploadManager(10,this.uploadFiles);
+            this.uploadManager.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -38,7 +32,6 @@ public class Controller {
             File f = new File(filePath);
             if(f.exists()){
                 if(f.isFile()){
-                    Socket s = new Socket(this.config.getProperty("host"),Integer.parseInt(this.config.getProperty("port")));
                     String[] strings = filePath.split("/");
                     String name = strings[strings.length -1];
                     StringBuilder stringBuilder = new StringBuilder();
@@ -46,7 +39,7 @@ public class Controller {
                         stringBuilder.append(strings[i]);
                         stringBuilder.append("/");
                     }
-                    uploadManager.service(s,stringBuilder.toString(),name);
+                    uploadFiles.addLast(new FileInfo(stringBuilder.toString(),0,name));
                 }
                 if (f.isDirectory()){
                     String[] strings = filePath.split("/");
@@ -59,9 +52,7 @@ public class Controller {
                     FindFiles findFiles = new FindFiles();
                     LinkedList<FileInfo> list = findFiles.getFiles(filePath);
                     for (int i = 0; i < list.size(); i++){
-                        Socket s = new Socket(this.config.getProperty("host"),Integer.parseInt(this.config.getProperty("port")));
-                        System.out.println(name+list.get(i).getPath()+list.get(i).getName()+"开始上传");
-                        uploadManager.service(s,stringBuilder.toString(),name+list.get(i).getPath()+list.get(i).getName());
+                        uploadFiles.addLast(new FileInfo(stringBuilder.toString(),1,name+list.get(i).getPath()+list.get(i).getName()));
                     }
                 }
             }else {

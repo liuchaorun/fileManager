@@ -12,11 +12,8 @@ import cn.liuchaorun.lib.ObjectAndBytes;
 import cn.liuchaorun.lib.RSAEncrypt;
 
 import javax.crypto.CipherOutputStream;
-import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.security.Key;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.logging.Logger;
 
 /**
@@ -36,8 +33,6 @@ public class Uploader {
             stringBuilder.append("/");
         }
         this.path = stringBuilder.toString();
-        System.out.println(this.name);
-        System.out.println(this.path);
     }
 
     /**
@@ -57,10 +52,10 @@ public class Uploader {
                 stringBuilder.append(c);
             }
             if(stringBuilder.toString().equals("OK")){
-                System.out.println("文件夹上传成功!");
+                //System.out.println("文件夹上传成功!");
             }
             else {
-                System.out.println("文件夹上传失败！");
+                //System.out.println("文件夹上传失败！");
             }
             dos.writeChars("CLOSE\n");
             dos.flush();
@@ -78,27 +73,31 @@ public class Uploader {
         try{
             dos.writeChars(path+name+'\n');
             dos.flush();
+
             long currentLength = dis.readLong();
             long actuallySkip = fileBufferedInputStream.skip(currentLength);
             while (actuallySkip < currentLength){
                 actuallySkip = fileBufferedInputStream.skip(currentLength - actuallySkip);
             }
+
             Key key = AES.generatorKey();
             byte[] iv = AES.generateIvParamterApec();
             dos.write(encrypt.publicKeyEncrypt(iv));
             dos.flush();
+
             byte[] o = ObjectAndBytes.toByteArray(key);
             dos.writeInt(o.length);
-            byte[] bytes = new byte[117];
+            byte[] bytes = new byte[116];
             int c = 0;
             while (c < o.length){
-                if(o.length - c>=117){
+                if(o.length - c>=116){
                     System.arraycopy(o,c,bytes,0,bytes.length);
                 }
                 else {
                     bytes = new byte[o.length - c];
                     System.arraycopy(o,c,bytes,0,bytes.length);
                 }
+
                 dos.write(encrypt.publicKeyEncrypt(bytes));
                 c+=bytes.length;
             }
@@ -109,6 +108,7 @@ public class Uploader {
             byte[] b = new byte[16];
             long fileLength = length;
             int l = 0;
+            //Logger.getGlobal().info(currentLength+" "+(fileLength - fileBufferedInputStream.available()));
             while (currentLength < fileLength){
                 if(fileLength - currentLength >=16){
                     l = fileBufferedInputStream.read(b);
@@ -127,5 +127,6 @@ public class Uploader {
         }catch (Exception err){
             err.printStackTrace();
         }
+
     }
 }

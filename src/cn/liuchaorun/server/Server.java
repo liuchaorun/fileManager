@@ -32,7 +32,7 @@ public class Server {
     public void start() {
         try {
             ServerSocket ss = new ServerSocket(Integer.parseInt(config.getProperty("port")));
-            System.out.println("Server start in port " + config.getProperty("port"));
+            //System.out.println("Server start in port " + config.getProperty("port"));
             while (true) {
                 Socket s = ss.accept();
                 s.setSoTimeout(5*1000);
