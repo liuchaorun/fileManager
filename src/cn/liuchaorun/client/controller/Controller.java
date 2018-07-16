@@ -20,7 +20,7 @@ public class Controller {
 
     public Controller() {
         try {
-            this.uploadManager = new UploadManager(10,this.uploadFiles);
+            this.uploadManager = new UploadManager(5,this.uploadFiles);
             this.uploadManager.start();
         } catch (Exception e) {
             e.printStackTrace();

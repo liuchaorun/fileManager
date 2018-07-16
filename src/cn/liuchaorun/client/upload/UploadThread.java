@@ -6,21 +6,30 @@
  */
 package cn.liuchaorun.client.upload;
 
+import cn.liuchaorun.client.controller.Controller;
 import cn.liuchaorun.lib.RSAEncrypt;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Properties;
 
 public class UploadThread extends Thread {
-    private Socket s;
     private Uploader uploader;
     private boolean isFile;
     private String filePath;
     private RSAEncrypt encrypt;
     private String absolutePath;
+    private Properties config;
 
     public UploadThread(RSAEncrypt encrypt){
-        this.s = null;
+        this.config = new Properties();
+        try{
+            String configPath = Controller.class.getResource("../../config.properties").toString();
+            FileReader fr = new FileReader(configPath.substring(5, configPath.length()));
+            this.config.load(fr);
+        }catch (Exception err){
+            err.printStackTrace();
+        }
         this.uploader = null;
         this.isFile = true;
         this.filePath = "";
@@ -28,8 +37,7 @@ public class UploadThread extends Thread {
         this.absolutePath = "";
     }
 
-    public synchronized void setSocketAndUploader(Socket s, Uploader uploader){
-        this.s = s;
+    public synchronized void setUploader(Uploader uploader){
         this.uploader = uploader;
         notify();
     }
@@ -47,7 +55,7 @@ public class UploadThread extends Thread {
     }
 
     public boolean isIdle(){
-        return this.s == null || this.uploader == null;
+        return this.uploader == null;
     }
 
     @Override
@@ -55,6 +63,7 @@ public class UploadThread extends Thread {
         try{
             while (true){
                 wait();
+                Socket s = new Socket(this.config.getProperty("host"), Integer.parseInt(this.config.getProperty("port")));
                 BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream(),512);
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream(),512);
                 DataInputStream dis = new DataInputStream(bufferedInputStream);
@@ -75,7 +84,6 @@ public class UploadThread extends Thread {
                 dis.close();
                 dos.close();
                 s.close();
-                this.s = null;
                 this.uploader = null;
             }
         }catch (Exception err){

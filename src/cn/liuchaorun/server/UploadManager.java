@@ -46,13 +46,13 @@ public class UploadManager {
             if(fileLength == -1){
                 File f = new File(path+name);
                 if(f.exists()){
-                    dos.writeChars("OK");
+                    dos.writeChars("OK\n");
                 }
                 else {
                     if(f.mkdirs()){
-                        dos.writeChars("OK");
+                        dos.writeChars("OK\n");
                     }else {
-                        dos.writeChars("FAILED");
+                        dos.writeChars("FAILED\n");
                     }
                 }
                 Logger.getGlobal().info(path+name+"上传完成");

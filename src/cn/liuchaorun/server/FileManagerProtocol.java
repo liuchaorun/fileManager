@@ -45,6 +45,11 @@ public class FileManagerProtocol implements SocketService {
             Logger.getGlobal().info("SOCKET CLOSE");
         }
         catch (Exception err){
+            try {
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             err.printStackTrace();
         }
     }

@@ -19,8 +19,6 @@ public class FindFiles {
             if (files != null) {
                 if(files.length == 0){
                     String absolute = (new File(f.getParent())).getPath();
-                    System.out.println(absolute);
-                    System.out.println(rootPath);
                     list.add(new FileInfo(f.getName(),-1,absolute.substring(rootPath.length(),absolute.length())+'/'));
                 }
                 else {
