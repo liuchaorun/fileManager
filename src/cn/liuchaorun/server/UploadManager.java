@@ -139,7 +139,6 @@ public class UploadManager {
             long start = System.currentTimeMillis()/1000;
             while (currentLength < fileLength){
                 byte[] data = new byte[length];
-                Logger.getGlobal().info(""+(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
                 length = cipherInputStream.read(data,0,(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
                 fileBufferedOutputStream.write(data,0,(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
                 fileBufferedOutputStream.flush();
@@ -154,6 +153,7 @@ public class UploadManager {
             }
             fileBufferedOutputStream.close();
         } catch (Exception e) {
+            Logger.getGlobal().info(""+(int)(fileLength-currentLength>=16?16:fileLength - currentLength));
             e.printStackTrace();
             Logger.getGlobal().info("文件上传中断，记录此次信息！");
             try{
