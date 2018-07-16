@@ -44,7 +44,7 @@ public class UploadManager {
     public void uploadDir(DataInputStream dis, DataOutputStream dos){
         try{
             if(fileLength == -1){
-                File f = new File(path+name);
+                File f = new File(path+name+'\n');
                 if(f.exists()){
                     dos.writeChars("OK\n");
                 }
