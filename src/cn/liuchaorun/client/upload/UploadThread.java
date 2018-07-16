@@ -21,13 +21,13 @@ public class UploadThread extends Thread {
     private String absolutePath;
     private Properties config;
 
-    public UploadThread(RSAEncrypt encrypt){
+    public UploadThread(RSAEncrypt encrypt) {
         this.config = new Properties();
-        try{
+        try {
             String configPath = Controller.class.getResource("../../config.properties").toString();
             FileReader fr = new FileReader(configPath.substring(5, configPath.length()));
             this.config.load(fr);
-        }catch (Exception err){
+        } catch (Exception err) {
             err.printStackTrace();
         }
         this.uploader = null;
@@ -37,7 +37,7 @@ public class UploadThread extends Thread {
         this.absolutePath = "";
     }
 
-    public synchronized void setUploader(Uploader uploader){
+    public synchronized void setUploader(Uploader uploader) {
         this.uploader = uploader;
         notify();
     }
@@ -54,39 +54,49 @@ public class UploadThread extends Thread {
         this.absolutePath = absolutePath;
     }
 
-    public boolean isIdle(){
+    public boolean isIdle() {
         return this.uploader == null;
     }
 
     @Override
     public synchronized void run() {
-        try{
-            while (true){
+        Socket s = null;
+        try {
+            while (true) {
                 wait();
-                Socket s = new Socket(this.config.getProperty("host"), Integer.parseInt(this.config.getProperty("port")));
-                BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream(),512);
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream(),512);
+                s = new Socket(this.config.getProperty("host"), Integer.parseInt(this.config.getProperty("port")));
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(s.getInputStream(), 512);
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(s.getOutputStream(), 512);
                 DataInputStream dis = new DataInputStream(bufferedInputStream);
                 DataOutputStream dos = new DataOutputStream(bufferedOutputStream);
                 dos.writeChars("UPLOAD\n");
                 dos.flush();
-                if(isFile){
-                    File f = new File(absolutePath+filePath);
+                if (isFile) {
+                    File f = new File(absolutePath + filePath);
                     dos.writeLong(f.length());
                     dos.flush();
                     FileInputStream fis = new FileInputStream(f);
                     BufferedInputStream fileBufferedInputStream = new BufferedInputStream(fis);
-                    uploader.uploadFile(fileBufferedInputStream,dis,dos,encrypt,f.length());
+                    uploader.uploadFile(fileBufferedInputStream, dis, dos, encrypt, f.length());
                     fis.close();
-                }else {
-                    uploader.uploadDir(dis,dos);
+                } else {
+                    uploader.uploadDir(dis, dos);
                 }
                 dis.close();
                 dos.close();
                 s.close();
+                s = null;
                 this.uploader = null;
             }
-        }catch (Exception err){
+        } catch (Exception err) {
+            try {
+                if (s != null) {
+                    s.close();
+                    s = null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             err.printStackTrace();
         }
     }

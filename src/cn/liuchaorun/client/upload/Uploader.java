@@ -40,28 +40,24 @@ public class Uploader {
      * @param dis
      * @param dos
      */
-    public void uploadDir(DataInputStream dis, DataOutputStream dos){
-        try {
-            StringBuilder stringBuilder = new StringBuilder();
-            dos.writeLong((long)-1);
-            dos.flush();
-            dos.writeChars(path + name+'\n');
-            dos.flush();
-            char c = 0;
-            while ((c = dis.readChar())!='\n'){
-                stringBuilder.append(c);
-            }
-            if(stringBuilder.toString().equals("OK")){
-                //System.out.println("文件夹上传成功!");
-            }
-            else {
-                //System.out.println("文件夹上传失败！");
-            }
-            dos.writeChars("CLOSE\n");
-            dos.flush();
-        }catch (Exception err){
-            err.printStackTrace();
+    public void uploadDir(DataInputStream dis, DataOutputStream dos) throws Exception{
+        StringBuilder stringBuilder = new StringBuilder();
+        dos.writeLong((long)-1);
+        dos.flush();
+        dos.writeChars(path + name+'\n');
+        dos.flush();
+        char c = 0;
+        while ((c = dis.readChar())!='\n'){
+            stringBuilder.append(c);
         }
+        if(stringBuilder.toString().equals("OK")){
+            //System.out.println("文件夹上传成功!");
+        }
+        else {
+            //System.out.println("文件夹上传失败！");
+        }
+        dos.writeChars("CLOSE\n");
+        dos.flush();
     }
 
     /**
